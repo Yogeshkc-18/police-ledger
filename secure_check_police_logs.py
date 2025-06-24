@@ -487,11 +487,42 @@ st.header("Law-Enforcement-Optimized NLP Filter")
 st.markdown("Provide the required details to generate a data driven prediction of the stop result")
 
 
-st.header("Log New Incident & Analyze Predicted Outcome and Infraction")
-with st.form("Incident_Log_form"):
-    stop_date = st.date_input("Stop Date")
-    stop_time = st.time_input("Stop Time")
-    country_name = st.text_input("Country Name")
-    driver_gender = st.selectbox("Driver Gender", ["male", "Female"])
-    driver_age = st.number_input("Driver Age", min_value=16, max_value=100,value=27)
-    driver_race= st.text_input("Driver Race")
+
+with st.form("stop_form"):
+    vehicle_number = st.text_input("🚘 Vehicle Number (e.g., TN59BM1234)", max_chars=20)
+    driver_age = st.number_input("🎂 Driver Age", min_value=18, max_value=80, value=35)
+    driver_gender = st.selectbox("👤 Gender", ["Male", "Female"])
+    violation = st.selectbox("🚧 Violation Type", ["Speeding", "Seatbelt", "Signal ", "DuI", "Others"])
+    stop_time = st.time_input("🕒 Stop Time", value=None)
+    search_conducted = st.selectbox("🔍 Was a search conducted?", ["Yes", "No"])
+    stop_outcome = st.selectbox("📄 Outcome", ["Ticket", "Warning", "Arrest"])
+    stop_duration = st.selectbox("⏱️ Stop Duration", ["0–5 minutes", "6–15 minutes", "16–30 minutes", "30+ minutes"])
+    drugs_related_stop = st.selectbox("💊 Drug Related?", ["Yes", "No"])
+
+    submit = st.form_submit_button("Generate 🚓 Report")
+
+# Output Section
+if submit:
+    # Format time
+    stop_time = stop_time.strftime('%I:%M %p') if stop_time else "Unknown time"
+    
+    # Base Sentence
+    summary = f"🚓 Vehicle **{vehicle_number}**: A {driver_age}-year-old {driver_gender.lower()} driver was stopped for **{violation}** at **{stop_time}**. "
+
+    # Search Status
+    if search_conducted == "Yes":
+        summary += "A **search was conducted**, "
+    else:
+        summary += "No **search was conducted**, "
+
+    # Outcome
+    summary += f"and {'he' if driver_gender == 'Male' else 'she'} was **{stop_outcome.lower()}**. "
+
+    # Duration and Drug
+    summary += f"The stop lasted **{stop_duration}** and was "
+    summary += "**drug-related**." if drug_related == "Yes" else "**not drug-related**."
+    
+
+    # Display
+    st.markdown("### ✅ Generated Statement")
+    st.markdown(summary)
